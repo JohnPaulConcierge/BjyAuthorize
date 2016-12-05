@@ -8,26 +8,18 @@
 
 namespace BjyAuthorize;
 
-use BjyAuthorize\Controller\Plugin;
 use BjyAuthorize\Guard\AbstractGuard;
-use BjyAuthorize\View\Helper;
 use BjyAuthorize\View\UnauthorizedStrategy;
 use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
-use Zend\ModuleManager\Feature\ControllerPluginProviderInterface;
-use Zend\ModuleManager\Feature\ViewHelperProviderInterface;
 
 /**
  * BjyAuthorize Module
  *
  * @author Ben Youngblood <bx.youngblood@gmail.com>
  */
-class Module implements
-    BootstrapListenerInterface,
-    ConfigProviderInterface,
-    ControllerPluginProviderInterface,
-    ViewHelperProviderInterface
+class Module implements BootstrapListenerInterface, ConfigProviderInterface
 {
     /**
      * {@inheritDoc}
@@ -35,13 +27,14 @@ class Module implements
     public function onBootstrap(EventInterface $event)
     {
         /* @var $app \Zend\Mvc\ApplicationInterface */
-        $app = $event->getTarget();
         /* @var $sm \Zend\ServiceManager\ServiceLocatorInterface */
+        /* @var UnauthorizedStrategy $strategy */
+        /** @var AbstractGuard[] $guards */
+
+        $app = $event->getTarget();
         $serviceManager = $app->getServiceManager();
         $config = $serviceManager->get('BjyAuthorize\Config');
-        /** @var UnauthorizedStrategy $strategy */
         $strategy = $serviceManager->get($config['unauthorized_strategy']);
-        /** @var AbstractGuard[] $guards */
         $guards = $serviceManager->get('BjyAuthorize\Guards');
 
         foreach ($guards as $guard) {
@@ -49,30 +42,6 @@ class Module implements
         }
 
         $strategy->attach($app->getEventManager());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getViewHelperConfig()
-    {
-        return array(
-            'factories' => array(
-                'isAllowed' => Helper\IsAllowedFactory::class,
-            ),
-        );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getControllerPluginConfig()
-    {
-        return array(
-            'factories' => array(
-                'isAllowed' => Plugin\IsAllowedFactory::class
-            ),
-        );
     }
 
     /**

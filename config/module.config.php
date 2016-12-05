@@ -5,6 +5,10 @@
  * @link https://github.com/bjyoungblood/BjyAuthorize for the canonical source repository
  * @license http://framework.zend.com/license/new-bsd New BSD License
  */
+namespace BjyAuthorize;
+
+use BjyAuthorize\View\Helper\IsAllowedFactory as isAllowedHelperFactory;
+use BjyAuthorize\Controller\Plugin\IsAllowedFactory as IsAllowedPluginFactory;
 
 return array(
     'bjyauthorize' => array(
@@ -91,6 +95,18 @@ return array(
         'initializers' => array(
             'BjyAuthorize\Service\AuthorizeAwareServiceInitializer'
                 => 'BjyAuthorize\Service\AuthorizeAwareServiceInitializer'
+        ),
+    ),
+
+    'view_helpers' => array(
+        'factories' => array(
+            'isAllowed' => isAllowedHelperFactory::class,
+        ),
+    ),
+
+    'controller_plugins' => array(
+        'factories' => array(
+            'isAllowed' => isAllowedPluginFactory::class
         ),
     ),
 
