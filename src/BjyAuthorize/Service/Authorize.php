@@ -238,8 +238,11 @@ class Authorize
     {
         $this->loaded && $this->loaded->__invoke();
 
+        $roles = $this->identityProvider->getIdentityRoles();
+        $role = $roles[0];
+
         try {
-            return $this->acl->isAllowed($this->getIdentity(), $resource, $privilege);
+            return $this->acl->isAllowed($role, $resource, $privilege);
         } catch (InvalidArgumentException $e) {
             return false;
         }
