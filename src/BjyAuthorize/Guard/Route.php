@@ -12,6 +12,7 @@ use BjyAuthorize\Exception\UnAuthorizedException;
 use BjyAuthorize\Provider\Rule\ProviderInterface as RuleProviderInterface;
 use BjyAuthorize\Provider\Resource\ProviderInterface as ResourceProviderInterface;
 
+use Users\Assertion\isAuthorized;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\ServiceManager\ServiceLocatorInterface;
@@ -56,8 +57,10 @@ class Route implements GuardInterface, RuleProviderInterface, ResourceProviderIn
             if (!is_array($rule['roles'])) {
                 $rule['roles'] = array($rule['roles']);
             }
-
-            $this->rules['route/' . $rule['route']] = $rule['roles'];
+            $this->rules['route/' . $rule['route']] = array($rule['roles']);
+            if (isset($rule[0])){
+                $this->rules['route/' . $rule['route']][] = $rule[0];
+            }
         }
     }
 
@@ -103,7 +106,11 @@ class Route implements GuardInterface, RuleProviderInterface, ResourceProviderIn
         $rules = array();
 
         foreach ($this->rules as $resource => $roles) {
-            $rules[] = array($roles, $resource);
+            $rule = array($roles[0], $resource, null);
+            if(isset($roles[1])){
+                $rule[] = $roles[1];
+            }
+            $rules[] = $rule;
         }
 
         return array('allow' => $rules);
