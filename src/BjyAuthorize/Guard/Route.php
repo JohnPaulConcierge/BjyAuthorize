@@ -61,6 +61,9 @@ class Route implements GuardInterface, RuleProviderInterface, ResourceProviderIn
             if (isset($rule[0])){
                 $this->rules['route/' . $rule['route']][] = $rule[0];
             }
+            if (isset($rule[1])){
+                $this->rules['route/' . $rule['route']][] = $rule[1];
+            }
         }
     }
 
@@ -110,6 +113,9 @@ class Route implements GuardInterface, RuleProviderInterface, ResourceProviderIn
             if(isset($roles[1])){
                 $rule[] = $roles[1];
             }
+            if(isset($roles[2])){
+                $rule[] = $roles[2];
+            }
             $rules[] = $rule;
         }
 
@@ -130,7 +136,17 @@ class Route implements GuardInterface, RuleProviderInterface, ResourceProviderIn
         $match      = $event->getRouteMatch();
         $routeName  = $match->getMatchedRouteName();
 
-        if ($service->isAllowed('route/' . $routeName)) {
+        $rules = $this->getRules();
+        // implements privileges in routes (not super pretty :s )
+        foreach ($rules as $ruleType){
+            foreach ($ruleType as $rule){
+                if($rule[1] === 'route/'.$routeName){
+                    $privilege = $rule[2];
+                }
+            }
+        }
+
+        if ($service->isAllowed('route/' . $routeName, $privilege)) {
             return;
         }
 
