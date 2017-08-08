@@ -139,6 +139,7 @@ class Route implements GuardInterface, RuleProviderInterface, ResourceProviderIn
 
         $rules = $this->getRules();
         // implements privilege in routes (not super pretty :s )
+        $privilege = null;
         foreach($rules as $ruleType){
             foreach ($ruleType as $rule){
                 if ($rule[1]==='route/'.$routeName){
