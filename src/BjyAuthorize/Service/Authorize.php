@@ -267,7 +267,11 @@ class Authorize
 
         if (!($this->acl instanceof Acl) || !$success) {
             $this->loadAcl();
-            $cache->setItem($this->config['cache_key'], $this->acl);
+            try {
+                $cache->setItem($this->config['cache_key'], $this->acl);
+            } catch(\Exception $e) {
+                error_log($e->getMessage());
+            }
         }
 
         $this->setIdentityProvider($this->serviceLocator->get('BjyAuthorize\Provider\Identity\ProviderInterface'));
